@@ -134,8 +134,8 @@ int usbuart_debug_write(const char *buf, size_t len);
 #define SWO_DMA_IRQ				NVIC_DMA1_CHANNEL6_IRQ
 #define SWO_DMA_ISR(x)			dma1_channel6_isr(x)
 
-#define LED_PORT GPIOC
-#define LED_IDLE_RUN GPIO15
+#define LED_PORT GPIOB
+#define LED_IDLE_RUN GPIO1
 #define SET_RUN_STATE(state)
 #define SET_ERROR_STATE(state)
 extern void set_idle_state(int state);

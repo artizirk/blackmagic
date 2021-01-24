@@ -51,9 +51,9 @@ uint8_t detect_rev()
 	gpio_set(GPIOB, GPIO9);
 	switch (rev) {
 	case 0:
-		gpio_clear(GPIOA, GPIO8);
-		gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
-					  GPIO_CNF_OUTPUT_PUSHPULL, GPIO8);
+		gpio_set(GPIOB, GPIO1);
+		gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
+					  GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
 		break;
 	case 1:
 		rcc_periph_clock_enable(RCC_GPIOC);
@@ -66,8 +66,8 @@ uint8_t detect_rev()
 	 * Pull USB_DP low. Device will reconnect automatically
 	 * when USB is set up later, as Pull-Up is hard wired*/
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
-				  GPIO_CNF_OUTPUT_OPENDRAIN, GPIO12);
-	gpio_clear(GPIOA, GPIO12);
+				  GPIO_CNF_OUTPUT_OPENDRAIN, GPIO9);
+	gpio_set(GPIOB, GPIO9);
 	rcc_periph_reset_pulse(RST_USB);
 	rcc_periph_clock_enable(RCC_USB);
 

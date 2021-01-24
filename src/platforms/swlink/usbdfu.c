@@ -35,10 +35,10 @@ void dfu_detach(void)
 	   and pulling USB_DP low*/
 	rcc_periph_reset_pulse(RST_USB);
 	rcc_periph_clock_enable(RCC_USB);
-	rcc_periph_clock_enable(RCC_GPIOA);
-	gpio_clear(GPIOA, GPIO12);
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ,
-		GPIO_CNF_OUTPUT_OPENDRAIN, GPIO12);
+	rcc_periph_clock_enable(RCC_GPIOB);
+	gpio_set(GPIOB, GPIO9);
+	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
+		GPIO_CNF_OUTPUT_OPENDRAIN, GPIO9);
 	scb_reset_system();
 }
 
@@ -54,15 +54,9 @@ int main(void)
 		 * Switch PB5 high. Read PB6 low means jumper plugged.
 		 */
 		gpio_set_mode(GPIOB, GPIO_MODE_INPUT,
-					  GPIO_CNF_INPUT_PULL_UPDOWN, GPIO6);
-		gpio_set(GPIOB, GPIO6);
-		gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
-					  GPIO_CNF_OUTPUT_PUSHPULL, GPIO5);
-		while (gpio_get(GPIOB, GPIO5))
-			gpio_clear(GPIOB, GPIO5);
-		while (!gpio_get(GPIOB, GPIO5))
-			gpio_set(GPIOB, GPIO5);
-		normal_boot = (gpio_get(GPIOB, GPIO6));
+					  GPIO_CNF_INPUT_PULL_UPDOWN, GPIO2);
+		gpio_set(GPIOB, GPIO2);
+		normal_boot = !(gpio_get(GPIOB, GPIO2));
 		break;
 	case 1:
 		/* Boot0/1 pins have 100k between Jumper and MCU
@@ -84,6 +78,15 @@ int main(void)
 	systick_interrupt_enable();
 	systick_counter_enable();
 
+	rcc_periph_clock_enable(RCC_GPIOB);
+	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
+		      GPIO_CNF_OUTPUT_OPENDRAIN, GPIO9);
+	gpio_set(GPIOB, GPIO9);
+
+	for (int i = 0; i < 0x80000; i++)
+		__asm__("nop");
+	gpio_clear(GPIOB, GPIO9);
+
 	dfu_init(&st_usbfs_v1_usb_driver);
 
 	dfu_main();
@@ -97,7 +100,7 @@ void sys_tick_handler(void)
 {
 	switch (rev) {
 	case 0:
-		gpio_toggle(GPIOA, GPIO8);
+		gpio_toggle(GPIOB, GPIO1);
 		break;
 	case 1:
 		gpio_toggle(GPIOC, GPIO13);

@@ -79,8 +79,8 @@ void platform_init(void)
 	switch (rev) {
 	case 0:
 		/* LED GPIO already set in detect_rev()*/
-		led_error_port = GPIOA;
-		led_error_pin = GPIO8;
+		led_error_port = GPIOB;
+		led_error_pin = GPIO1;
 		adc_init();
 		break;
 	case 1:
@@ -107,6 +107,16 @@ void platform_init(void)
 	/* Relocate interrupt vector table here */
 	extern int vector_table;
 	SCB_VTOR = (uint32_t)&vector_table;
+
+	// enable usb
+	rcc_periph_clock_enable(RCC_GPIOB);
+	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
+		      GPIO_CNF_OUTPUT_OPENDRAIN, GPIO9);
+	gpio_set(GPIOB, GPIO9);
+
+	for (int i = 0; i < 0x80000; i++)
+		__asm__("nop");
+	gpio_clear(GPIOB, GPIO9);
 
 	platform_timing_init();
 	cdcacm_init();
@@ -183,7 +193,7 @@ void set_idle_state(int state)
 {
 	switch (rev) {
 	case 0:
-		gpio_set_val(GPIOA, GPIO8, state);
+		gpio_set_val(GPIOB, GPIO1, state);
 		break;
 	case 1:
 		gpio_set_val(GPIOC, GPIO13, (!state));
